@@ -1,0 +1,26 @@
+{
+  "name": "create-brass",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "bin": {
+    "create-brass": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "templates"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts",
+    "dev": "node dist/index.js"
+  },
+  "dependencies": {
+    "picocolors": "^1.0.0",
+    "prompts": "^2.4.2"
+  },
+  "devDependencies": {
+    "@types/prompts": "^2.4.9",
+    "tsup": "^8.2.0",
+    "typescript": "^5.5.4"
+  }
+}

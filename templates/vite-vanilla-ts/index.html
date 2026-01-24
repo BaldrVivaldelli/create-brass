@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Brass Runtime – Scope Boxes (vanilla)</title>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>Brass Runtime – Scope Boxes</h1>
+      <p class="subtitle">
+        Visual onboarding demo (vanilla TS). Scopes are boxes. Tasks run inside. Scenarios explain what’s happening progressively.
+      </p>
+
+      <div class="controls">
+        <select id="mode"></select>
+        <button class="primary" id="run">Run</button>
+        <button class="danger" id="hardCancel">Hard cancel</button>
+        <button id="softCancel">Cancel (soft)</button>
+        <button id="reset">Reset</button>
+        <span class="badge"><span class="dot"></span> Tip: run “Parallel POST ×2” to see structured concurrency</span>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <div id="canvas"></div>
+          <small class="muted">
+            (Template) Replace the scripted controller with real Brass execution by emitting the same events.
+          </small>
+        </div>
+
+        <div class="card">
+          <div class="eventsHeader">
+            <strong>Events</strong>
+            <small class="muted">newest first</small>
+          </div>
+          <pre class="log" id="events">No events yet. Click Run.</pre>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
