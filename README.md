@@ -88,7 +88,7 @@ node dist/index.js my-app --template=vite-react-ts
 
 ### Vite React + TypeScript
 ```bash
-npm create vite@latest my-app --template react-ts
+npm create vite@latest my-app --template=vite-react-ts
 cd my-app
 npm install
 npm run dev
@@ -96,7 +96,7 @@ npm run dev
 
 ### Vite Vanilla + TypeScript
 ```bash
-npm create vite@latest my-app --template vanilla-ts
+npm create vite@latest my-app --template=vite-vanilla-ts
 cd my-app
 npm install
 npm run dev
