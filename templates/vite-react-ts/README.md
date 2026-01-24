@@ -1,4 +1,4 @@
-# Brass Runtime – HTTP + Scope Tour (template)
+# Brass Runtime – HTTP (template)
 
 This folder is copied by `create-brass`.
 
@@ -19,7 +19,7 @@ A visual, beginner-friendly onboarding demo:
 - GET 404 converted into error (because fetch doesn’t throw)
 - GET with meta (durationMs)
 - POST with meta (id + durationMs)
-- Parallel POST ×2 with `withScope + zipPar`
+- Parallel POST ×2 with `withScopeAsync + zipPar`
 - Parallel POST ×2 with manual `new Scope(env) ... finally close()`
 
 ## Where to plug Brass in

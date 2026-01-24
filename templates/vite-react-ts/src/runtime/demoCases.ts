@@ -1,7 +1,8 @@
 import type { Task, TourEvent } from "../types";
 
 // Use your real exports (these match your example snippet).
-import { fromPromiseAbortable, Scope, toPromise, withScope, zipPar } from "brass-runtime";
+// NOTE: withScopeAsync is the safe variant for Async/Effect-returning bodies.
+import { fromPromiseAbortable, Scope, toPromise, withScopeAsync, zipPar } from "brass-runtime";
 import { httpClient, httpClientWithMeta } from "brass-runtime/http";
 
 type Env = any;
@@ -275,7 +276,7 @@ export function createDemoController(emit: (e: TourEvent) => void): DemoControll
     runningTasks.add(mkTask(task2, scopeId, "POST /posts #2 (zipPar)") .id);
 
     note("Scenario: zipPar runs two effects concurrently and waits for both.");
-    note("withScope creates and manages the parent scope automatically.");
+    note("withScopeAsync creates and manages the parent scope automatically.");
     await sleep(250); if (isStale(t)) return;
 
     const e1 = http.postJson<Post>("/posts", postBody, { headers: { accept: "application/json" } });
@@ -283,7 +284,7 @@ export function createDemoController(emit: (e: TourEvent) => void): DemoControll
 
     try {
       note("Forking both requests…");
-      const program = withScope((parentScope: any) => zipPar(e1, e2, parentScope));
+      const program = withScopeAsync((parentScope: any) => zipPar(e1, e2, parentScope));
       const [r1, r2] = await toPromise(program, env);
       if (isStale(t)) return;
 

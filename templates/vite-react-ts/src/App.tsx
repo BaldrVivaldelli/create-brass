@@ -35,7 +35,7 @@ const MODE_LABEL: Record<Mode, string> = {
   "simple:get404": "GET 404 → error (fetch doesn’t throw)",
   "meta:get": "GET with meta (durationMs)",
   "meta:post": "POST with meta (id + durationMs)",
-  "par:withScope": "Parallel POST ×2 (withScope + zipPar)",
+  "par:withScope": "Parallel POST ×2 (withScopeAsync + zipPar)",
   "par:manual": "Parallel POST ×2 (manual Scope + zipPar)"
 };
 
@@ -103,7 +103,7 @@ export default function App() {
 
   return (
     <div className="wrap">
-      <h1>Brass Runtime – HTTP + Scope Tour</h1>
+      <h1>Brass Runtime – HTTP + Template</h1>
       <p>
         A progressive, beginner-friendly demo: scopes are boxes, tasks run inside, and events explain what’s happening.
         Pick a scenario and press Run.

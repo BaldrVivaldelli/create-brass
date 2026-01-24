@@ -13,7 +13,7 @@ npm run dev
 - Multiple scenarios:
   - cancelable fetch (ok + 404 error)
   - Brass HTTP with meta (GET/POST)
-  - parallel POST ×2 with withScope+zipPar
+  - parallel POST ×2 with withScopeAsync+zipPar
   - parallel POST ×2 with manual Scope+zipPar (try/finally close)
 
 ## Controls
@@ -22,7 +22,7 @@ npm run dev
 
 ## Plug Brass in
 The demo imports the same symbols as your example snippet:
-- `fromPromiseAbortable`, `Scope`, `toPromise`, `withScope`, `zipPar`
+- `fromPromiseAbortable`, `Scope`, `toPromise`, `withScopeAsync`, `zipPar`
 - `httpClientWithMeta` from `"brass-runtime/http"`
 
 Adjust imports if your public package paths differ.

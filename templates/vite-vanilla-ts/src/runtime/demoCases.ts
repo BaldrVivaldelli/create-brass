@@ -1,7 +1,8 @@
 import type { Task, TourEvent } from "../types";
 
 // Use your real exports (these match your example snippet).
-import { fromPromiseAbortable, Scope, toPromise, withScope, zipPar } from "brass-runtime";
+// NOTE: withScopeAsync is the safe variant for Async/Effect-returning bodies.
+import { fromPromiseAbortable, Scope, toPromise, withScopeAsync, zipPar } from "brass-runtime";
 import { httpClient, httpClientWithMeta } from "brass-runtime/http";
 
 type Env = any;
@@ -22,7 +23,7 @@ export const MODE_LABEL: Record<Mode, string> = {
   "simple:get404": "Simple GET 404 → throw (fetch doesn't throw)",
   "meta:get": "HTTP client with meta: GET /posts/1",
   "meta:post": "HTTP client with meta: POST /posts",
-  "par:withScope": "Parallel POST ×2 (withScope + zipPar)",
+  "par:withScope": "Parallel POST ×2 (withScopeAsync + zipPar)",
   "par:manual": "Parallel POST ×2 (manual Scope + zipPar)"
 };
 
@@ -286,7 +287,7 @@ export function createDemoController(emit: (e: TourEvent) => void): DemoControll
     emit({ t: "scope_created", scopeId, label: "HTTP scope" });
     scopeOpen = true;
 
-    note("Scenario: run two POST requests in parallel using withScope + zipPar.");
+    note("Scenario: run two POST requests in parallel using withScopeAsync + zipPar.");
     note("Structured concurrency: both tasks belong to the same parent scope.");
 
     const http = httpClientWithMeta({ baseUrl: "https://jsonplaceholder.typicode.com" });
@@ -305,7 +306,7 @@ export function createDemoController(emit: (e: TourEvent) => void): DemoControll
 
     note("zipPar forks both tasks and waits for both results.");
     try {
-      const program = withScope((parentScope: any) => zipPar(e1 as any, e2 as any, parentScope));
+      const program = withScopeAsync((parentScope: any) => zipPar(e1 as any, e2 as any, parentScope));
       const [r1, r2] = await toPromise(program as any, env);
       if (isStale(t)) return;
 
@@ -317,7 +318,7 @@ export function createDemoController(emit: (e: TourEvent) => void): DemoControll
 
       note(`F1: status=${s1.status} ms=${s1.ms ?? "-"} id=${s1.id ?? "-"}`);
       note(`F2: status=${s2.status} ms=${s2.ms ?? "-"} id=${s2.id ?? "-"}`);
-      note("withScope handles the scope lifetime automatically.");
+      note("withScopeAsync handles the scope lifetime automatically.");
     } catch (e: any) {
       if (isStale(t)) return;
       emit({ t: "task_state", taskId: "F1", state: "failed" }); runningTasks.delete("F1");

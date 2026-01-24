@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-   "brass-runtime": "^1.9.3"
+   "brass-runtime": "^1.9.4"
   },
   "devDependencies": {
     "typescript": "^5.5.4",
