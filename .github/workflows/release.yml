@@ -1,35 +1,48 @@
 name: Release
 
 on:
-  push:
-    branches: [ main ]
   workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish the next stable version from main
+        required: true
+        default: false
+        type: boolean
 
 permissions:
-  contents: write
-  issues: write
-  pull-requests: write
+  contents: read
 
 concurrency:
-  group: release
+  group: create-brass-stable
   cancel-in-progress: false
 
 jobs:
   release:
+    if: ${{ github.ref == 'refs/heads/main' && inputs.publish }}
     runs-on: ubuntu-latest
+    environment: npm-stable
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
           registry-url: "https://registry.npmjs.org"
 
+      - name: Pin npm
+        run: npm install --global npm@11.5.1
+
       - name: Install deps (include optional)
         run: npm ci --include=optional
+      - run: npm run validate:release-policy
       - run: npm run build
       - run: npm run test:templates
       - run: npm run test:templates:rollback
