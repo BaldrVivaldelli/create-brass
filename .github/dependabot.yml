@@ -33,6 +33,28 @@ updates:
           - "vite*"
         update-types: ["minor", "patch"]
 
+  - package-ecosystem: "npm"
+    directories:
+      - "/templates/vite-react-ts"
+      - "/templates/vite-vanilla-ts"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:15"
+      timezone: "America/Argentina/Buenos_Aires"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "deps(templates)"
+      include: "scope"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
+    groups:
+      templates-minor-patch:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+
   # GitHub Actions (archivos en .github/workflows)
   - package-ecosystem: "github-actions"
     directory: "/"

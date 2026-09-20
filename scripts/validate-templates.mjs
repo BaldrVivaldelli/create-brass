@@ -108,7 +108,8 @@ try {
           ? " using the beta /v1 bridge"
           : "";
     console.log(`\nValidating ${template}${runtimeTarball ? ` with ${basename(runtimeTarball)}` : ""}${facadeLabel}...`);
-    run(["install", "--ignore-scripts", "--no-audit", "--no-fund", "--package-lock=false"], staged);
+    run(["install", "--ignore-scripts", "--no-audit", "--no-fund"], staged);
+    run(["audit", "--audit-level=high"], staged);
     run(["run", "build"], staged);
   }
 

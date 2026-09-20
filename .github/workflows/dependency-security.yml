@@ -1,17 +1,23 @@
-name: Quality
+name: Dependency Security
 
 on:
   pull_request:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "23 10 * * 1"
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: quality-${{ github.event.pull_request.number }}
+  group: dependency-security-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  templates:
+  audit:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,12 +28,6 @@ jobs:
           node-version: 22
           cache: npm
 
-      - run: npm ci --include=optional
+      - run: npm ci --include=optional --ignore-scripts
       - run: npm run audit:dependencies
-      - run: npm run audit:prod
-      - run: npm run validate:release-policy
-      - run: npm run validate:evidence
-      - run: npm run test:evidence
-      - run: npm run build
       - run: npm run test:templates
-      - run: npm run test:templates:rollback

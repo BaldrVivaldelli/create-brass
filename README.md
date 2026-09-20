@@ -64,6 +64,10 @@ Build both generated templates against their declared dependencies:
 npm run test:templates
 ```
 
+Template validation creates a temporary lockfile, rejects high/critical npm
+advisories, and then runs the production build. Audit the CLI's complete locked
+dependency tree separately with `npm run audit:dependencies`.
+
 To validate against a local Brass release candidate instead:
 
 ```bash
