@@ -33,7 +33,19 @@ try {
   mutatedDigest.candidate.artifact.tarball.sha256 = "not-a-digest";
   assert.equal(validate(mutatedDigest).status, 1, "mutated artifact identity must fail");
 
-  console.log("Beta evidence integrity tests passed (5 cases).");
+  const falseOidcPublication = structuredClone(committed);
+  falseOidcPublication.oidcReadiness.registry.candidatePublished = true;
+  assert.equal(validate(falseOidcPublication).status, 1, "OIDC validation cannot claim publication");
+
+  const weakenedOidcControls = structuredClone(committed);
+  weakenedOidcControls.oidcReadiness.controls.requiredChecks = ["templates", "CodeQL"];
+  assert.equal(validate(weakenedOidcControls).status, 1, "current audit protection must remain recorded");
+
+  const mutatedOidcDigest = structuredClone(committed);
+  mutatedOidcDigest.oidcReadiness.artifact.tarball.sha256 = "not-a-digest";
+  assert.equal(validate(mutatedOidcDigest).status, 1, "current OIDC artifact identity must fail closed");
+
+  console.log("Beta evidence integrity tests passed (8 cases).");
 } finally {
   rmSync(directory, { recursive: true, force: true });
 }

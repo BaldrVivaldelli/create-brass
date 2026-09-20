@@ -65,18 +65,6 @@ if (!Number.isInteger(artifact?.id)
   || !/^sha512-/.test(tarball?.integrity ?? "")) {
   failures.push("retained beta artifact or tarball identity is incomplete");
 }
-if (tarballPath) {
-  if (!existsSync(tarballPath)) {
-    failures.push("supplied beta tarball does not exist");
-  } else {
-    const bytes = readFileSync(tarballPath);
-    if (statSync(tarballPath).size !== tarball.bytes) failures.push("beta tarball byte count does not match evidence");
-    if (createHash("sha256").update(bytes).digest("hex") !== tarball.sha256) {
-      failures.push("beta tarball sha256 does not match evidence");
-    }
-  }
-}
-
 if (evidence.publicationAttempt?.runId !== candidate?.workflow?.runId
   || evidence.publicationAttempt?.environment !== "npm-next"
   || evidence.publicationAttempt?.approvalGranted !== true
@@ -86,6 +74,78 @@ if (evidence.publicationAttempt?.runId !== candidate?.workflow?.runId
   || evidence.publicationAttempt?.publishStep !== "skipped"
   || evidence.publicationAttempt?.registryMutation !== false) {
   failures.push("failed publication preflight must remain explicit and pre-publish");
+}
+
+const oidc = evidence.oidcReadiness;
+const oidcArtifact = oidc?.artifact;
+const oidcTarball = oidcArtifact?.tarball;
+if (!Number.isFinite(Date.parse(oidc?.recordedAt))
+  || oidc?.source?.repository !== "BaldrVivaldelli/create-brass"
+  || oidc?.source?.branch !== "main"
+  || !/^[a-f0-9]{40}$/.test(oidc?.source?.sha ?? "")
+  || oidc?.source?.pullRequest !== 18
+  || oidc?.authentication?.mode !== "npm-trusted-publishing-oidc"
+  || oidc?.authentication?.workflow !== "publish-beta.yml"
+  || oidc?.authentication?.node !== "22"
+  || oidc?.authentication?.npmCli !== "11.5.1"
+  || oidc?.authentication?.environment !== "npm-next"
+  || oidc?.authentication?.idTokenPermission !== "publish-job-only"
+  || oidc?.authentication?.repositoryTokenSecretRequired !== false
+  || oidc?.authentication?.trustedPublisherConfiguration !== "requires-package-owner-confirmation") {
+  failures.push("OIDC source and trusted-publishing prerequisites are incomplete");
+}
+if (oidc?.validation?.runId !== 35533454283
+  || oidc?.validation?.event !== "workflow_dispatch"
+  || oidc?.validation?.version !== candidate?.version
+  || oidc?.validation?.publishRequested !== false
+  || oidc?.validation?.validationJobId !== 106138165503
+  || oidc?.validation?.validationResult !== "success"
+  || oidc?.validation?.publishJobId !== 106138375689
+  || oidc?.validation?.publishResult !== "skipped-by-input"
+  || oidc?.validation?.productionAuditResult !== "success"
+  || oidc?.validation?.registryMutation !== false) {
+  failures.push("OIDC validation run must remain successful, non-publishing, and immutable");
+}
+if (oidcArtifact?.id !== 10612356957
+  || oidcArtifact?.name !== `create-brass-beta-${candidate?.version}`
+  || oidcArtifact?.archiveBytes !== 17430
+  || !/^sha256:[a-f0-9]{64}$/.test(oidcArtifact?.archiveDigest ?? "")
+  || !Number.isFinite(Date.parse(oidcArtifact?.expiresAt))
+  || oidcTarball?.filename !== `create-brass-${candidate?.version}.tgz`
+  || oidcTarball?.bytes !== 17248
+  || oidcTarball?.unpackedBytes !== 68181
+  || oidcTarball?.files !== 32
+  || !/^[a-f0-9]{64}$/.test(oidcTarball?.sha256 ?? "")
+  || !/^[a-f0-9]{40}$/.test(oidcTarball?.shasum ?? "")
+  || !/^sha512-/.test(oidcTarball?.integrity ?? "")) {
+  failures.push("OIDC beta artifact or tarball identity is incomplete");
+}
+if (oidc?.controls?.mainProtected !== true
+  || !["templates", "audit", "CodeQL"].every((check) => oidc?.controls?.requiredChecks?.includes(check))
+  || oidc?.controls?.adminsEnforced !== true
+  || oidc?.controls?.forcePushesAllowed !== false
+  || oidc?.controls?.deletionsAllowed !== false
+  || oidc?.controls?.protectedBranchesOnly !== true
+  || oidc?.controls?.environmentReviewerRequired !== true) {
+  failures.push("current OIDC branch and environment controls are incomplete");
+}
+if (!Number.isFinite(Date.parse(oidc?.registry?.checkedAt))
+  || oidc?.registry?.latest !== evidence.source?.stableVersion
+  || oidc?.registry?.next !== null
+  || oidc?.registry?.candidatePublished !== false
+  || !oidc?.claimBoundary?.includes("not publication")) {
+  failures.push("OIDC registry snapshot or claim boundary is invalid");
+}
+if (tarballPath) {
+  if (!existsSync(tarballPath)) {
+    failures.push("supplied beta tarball does not exist");
+  } else {
+    const bytes = readFileSync(tarballPath);
+    if (statSync(tarballPath).size !== oidcTarball?.bytes) failures.push("beta tarball byte count does not match current evidence");
+    if (createHash("sha256").update(bytes).digest("hex") !== oidcTarball?.sha256) {
+      failures.push("beta tarball sha256 does not match current evidence");
+    }
+  }
 }
 if (evidence.registry?.latest !== evidence.source?.stableVersion
   || !Number.isFinite(Date.parse(evidence.registry?.checkedAt))
@@ -126,5 +186,5 @@ if (failures.length > 0) {
 
 console.log(
   `Beta readiness evidence validated (${candidate.version}, ${candidate.validationMatrix.length} modes, ` +
-  `published at snapshot: no, tarball checked: ${tarballPath ? "yes" : "no"}).`,
+  `OIDC candidate validated: yes, published at snapshot: no, tarball checked: ${tarballPath ? "yes" : "no"}).`,
 );
