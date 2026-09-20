@@ -68,6 +68,71 @@
     "publishStep": "skipped",
     "registryMutation": false
   },
+  "oidcReadiness": {
+    "recordedAt": "2026-09-20T20:08:30Z",
+    "source": {
+      "repository": "BaldrVivaldelli/create-brass",
+      "branch": "main",
+      "sha": "c700b5a412c5523c25614dde6ff30e54d7d7e48a",
+      "pullRequest": 18,
+      "pullRequestUrl": "https://github.com/BaldrVivaldelli/create-brass/pull/18"
+    },
+    "authentication": {
+      "mode": "npm-trusted-publishing-oidc",
+      "workflow": "publish-beta.yml",
+      "node": "22",
+      "npmCli": "11.5.1",
+      "environment": "npm-next",
+      "idTokenPermission": "publish-job-only",
+      "repositoryTokenSecretRequired": false,
+      "trustedPublisherConfiguration": "requires-package-owner-confirmation"
+    },
+    "validation": {
+      "runId": 35533454283,
+      "runUrl": "https://github.com/BaldrVivaldelli/create-brass/actions/runs/35533454283",
+      "event": "workflow_dispatch",
+      "version": "1.3.0-beta.0",
+      "publishRequested": false,
+      "validationJobId": 106138165503,
+      "validationResult": "success",
+      "publishJobId": 106138375689,
+      "publishResult": "skipped-by-input",
+      "productionAuditResult": "success",
+      "registryMutation": false
+    },
+    "artifact": {
+      "id": 10612356957,
+      "name": "create-brass-beta-1.3.0-beta.0",
+      "archiveBytes": 17430,
+      "archiveDigest": "sha256:fb9dafcc79531676739c4d0eca373762704745b67488b4b79ad4fcfafc5e0b98",
+      "expiresAt": "2026-12-19T19:47:35Z",
+      "tarball": {
+        "filename": "create-brass-1.3.0-beta.0.tgz",
+        "bytes": 17248,
+        "unpackedBytes": 68181,
+        "files": 32,
+        "sha256": "7d41309b8a55d9ebc13ce12b687c08682eee53239a6168c385fc485dcba57c59",
+        "shasum": "62c159ba1ef53f8ec6d9fd765c8cfa8898061daf",
+        "integrity": "sha512-A2t2HRVvPgwl1GmvEJ+mqLa1zppZHoYxpOFV3VPfSPi/9+X/qUvHogU409JGicgiNlb/Namg8Ep8Kq2OeGud/w=="
+      }
+    },
+    "controls": {
+      "mainProtected": true,
+      "requiredChecks": ["templates", "audit", "CodeQL"],
+      "adminsEnforced": true,
+      "forcePushesAllowed": false,
+      "deletionsAllowed": false,
+      "protectedBranchesOnly": true,
+      "environmentReviewerRequired": true
+    },
+    "registry": {
+      "checkedAt": "2026-09-20T20:08:30Z",
+      "latest": "1.2.1",
+      "next": null,
+      "candidatePublished": false
+    },
+    "claimBoundary": "This proves the token-free workflow and exact candidate after dependency hardening; it is not publication, independent adoption, or production-use evidence."
+  },
   "registry": {
     "checkedAt": "2026-09-20T18:29:13Z",
     "latest": "1.2.1",
@@ -99,7 +164,8 @@
     "latestMustRemain": "1.2.1"
   },
   "limitations": [
-    "The npm beta was not published because the repository token failed npm whoami with E401 before the publish step.",
+    "The first npm beta attempt was not published because the repository token failed npm whoami with E401 before the publish step.",
+    "The replacement OIDC workflow passed with publish=false; a package-owner-confirmed npm Trusted Publisher remains required before its first publish=true execution.",
     "The retained artifact expires; committed hashes preserve its identity after expiry.",
     "Template production builds do not establish external production adoption, retention, latency, or operational reliability.",
     "The public repository is first-party and does not satisfy the independent external case-study target."
@@ -110,7 +176,9 @@
     "npm run test:templates:rollback",
     "npm run test:templates:v2-beta -- --runtime-tarball <brass-runtime-2.0.0-beta.0.tgz>",
     "npm run test:templates:v1-bridge -- --runtime-tarball <brass-runtime-2.0.0-beta.0.tgz>",
-    "gh run download 35529031936 --name create-brass-beta-1.3.0-beta.0",
-    "sha256sum create-brass-1.3.0-beta.0.tgz"
+    "gh run download 35529031936 --name create-brass-beta-1.3.0-beta.0 --dir token-attempt",
+    "sha256sum token-attempt/create-brass-1.3.0-beta.0.tgz",
+    "gh run download 35533454283 --name create-brass-beta-1.3.0-beta.0 --dir oidc-validation",
+    "sha256sum oidc-validation/create-brass-1.3.0-beta.0.tgz"
   ]
 }
