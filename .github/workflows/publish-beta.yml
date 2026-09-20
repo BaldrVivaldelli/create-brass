@@ -37,7 +37,10 @@ jobs:
         run: npm install --global npm@11.5.1
 
       - run: npm ci --include=optional
+      - run: npm run audit:prod
       - run: npm run validate:release-policy
+      - run: npm run validate:evidence
+      - run: npm run test:evidence
       - run: npm run build
       - run: npm run test:templates
       - run: npm run test:templates:rollback
