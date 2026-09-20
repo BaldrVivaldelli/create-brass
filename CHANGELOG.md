@@ -1,3 +1,9 @@
+# Unreleased
+
+- Add a protected, opt-in `next` beta channel with exact-version validation,
+  runtime-v2 and v1-rollback template builds, npm provenance, immutable-version
+  checks, and a post-publication guard that preserves `latest`.
+
 ## [1.2.1](https://github.com/BaldrVivaldelli/create-brass/compare/v1.2.0...v1.2.1) (2026-01-24)
 
 # [1.2.0](https://github.com/BaldrVivaldelli/create-brass/compare/v1.1.0...v1.2.0) (2026-01-24)

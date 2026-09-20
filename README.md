@@ -61,6 +61,19 @@ node dist/index.js my-app --template=vite-react-ts
 
 > The CLI only copies files from `templates/`. It does not require Vite/React installed globally.
 
+## Release channels
+
+- `latest` is the stable CLI and is released only from `main`.
+- `next` is an explicit beta published only by the protected manual workflow.
+- Beta publication records `latest` before publishing and verifies that it did
+  not move after npm registry propagation.
+
+Try an approved beta without replacing the stable CLI:
+
+```bash
+npm create brass@next my-app
+```
+
 ## Project structure
 
 ```txt
