@@ -132,7 +132,7 @@ export default function App() {
         <div className="card">
           <ScopeBoxesCanvas scope={scope} tasks={tasks} />
           <small className="muted">
-            Wire your real Brass exports in <code>src/runtime/demoCases.ts</code> if needed.
+            Brass imports are isolated in <code>src/runtime/brass.ts</code> for safe preview rollback.
             This demo emits human explanations as <code>note</code> events while work is running.
           </small>
         </div>

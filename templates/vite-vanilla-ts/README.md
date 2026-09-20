@@ -20,9 +20,13 @@ npm run dev
 - **Hard cancel**: marks running tasks as cancelled and shows cleanup.
 - **Cancel (soft)**: stops the progressive narration (no forced cancellation).
 
-## Plug Brass in
-The demo imports the same symbols as your example snippet:
-- `fromPromiseAbortable`, `Scope`, `toPromise`, `withScopeAsync`, `zipPar`
-- `httpClientWithMeta` from `"brass-runtime/http"`
+## Brass API boundary
 
-Adjust imports if your public package paths differ.
+`src/runtime/brass.ts` is the reversible application facade. Most runtime
+concepts come from the additive `brass-runtime/next` preview; `zipPar` remains
+on the supported v1 root until the preview has an evidence-backed replacement.
+HTTP stays on `brass-runtime/http`.
+
+To roll back the preview, replace only that facade with equivalent stable-root
+exports and a small `Effect.fromPromiseAbortable` adapter; no call-site, data,
+or state migration is required.

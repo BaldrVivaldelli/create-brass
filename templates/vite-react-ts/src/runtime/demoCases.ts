@@ -1,8 +1,13 @@
 import type { Task, TourEvent } from "../types";
 
-// Use your real exports (these match your example snippet).
-// NOTE: withScopeAsync is the safe variant for Async/Effect-returning bodies.
-import { fromPromiseAbortable, Scope, toPromise, withScopeAsync, zipPar } from "brass-runtime";
+import {
+  Effect,
+  makeRuntime,
+  runPromise,
+  Scope,
+  withScopeAsync,
+  zipPar
+} from "./brass";
 import { httpClient, httpClientWithMeta } from "brass-runtime/http";
 
 type Env = any;
@@ -47,6 +52,7 @@ export type DemoController = {
 
 export function createDemoController(emit: (e: TourEvent) => void): DemoController {
   const env: Env = {};
+  const runtime = makeRuntime(env);
   const scopeId = "S1";
 
   // Track what is currently "running" in the UI so hard-cancel can stop it.
@@ -127,7 +133,7 @@ export function createDemoController(emit: (e: TourEvent) => void): DemoControll
     note("Scenario: wrapping native fetch with fromPromiseAbortable so it can be cancelled via AbortSignal.");
     await sleep(250); if (isStale(t)) return;
 
-    const demoSimpleCalls = fromPromiseAbortable(
+    const demoSimpleCalls = Effect.fromPromiseAbortable(
       async (signal) => {
         // Optional: small artificial delay so Cancel has time to happen in demos.
         for (let i = 0; i < 20; i++) {
@@ -148,7 +154,7 @@ export function createDemoController(emit: (e: TourEvent) => void): DemoControll
     await sleep(250); if (isStale(t)) return;
 
     try {
-      const res = await toPromise(demoSimpleCalls, env);
+      const res = await runPromise(demoSimpleCalls, runtime);
       if (isStale(t)) return;
       emit({ t: "task_state", taskId, state: "done" });
       const s = summarize("simple GET", res);
@@ -172,7 +178,7 @@ export function createDemoController(emit: (e: TourEvent) => void): DemoControll
     note("Scenario: fetch does NOT throw for 404/500. We convert non-ok into an error explicitly.");
     await sleep(250); if (isStale(t)) return;
 
-    const eff = fromPromiseAbortable(
+    const eff = Effect.fromPromiseAbortable(
       async (signal) => {
         const r = await fetch(`${baseUrl}/posts/999999`, { signal });
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -186,7 +192,7 @@ export function createDemoController(emit: (e: TourEvent) => void): DemoControll
     await sleep(200); if (isStale(t)) return;
 
     try {
-      const res = await toPromise(eff, env);
+      const res = await runPromise(eff, runtime);
       if (isStale(t)) return;
       emit({ t: "task_state", taskId, state: "done" });
       const s = summarize("GET 404", res);
@@ -214,7 +220,7 @@ export function createDemoController(emit: (e: TourEvent) => void): DemoControll
 
     try {
       note("Starting request…");
-      const res = await toPromise(http.getJson<Post>("/posts/1"), env);
+      const res = await runPromise(http.getJson<Post>("/posts/1"), runtime);
       if (isStale(t)) return;
       emit({ t: "task_state", taskId, state: "done" });
       const s = summarize("meta GET", res);
@@ -244,9 +250,9 @@ export function createDemoController(emit: (e: TourEvent) => void): DemoControll
 
     try {
       note("Sending request…");
-      const res = await toPromise(
+      const res = await runPromise(
         http.postJson<Post>("/posts", postBody, { headers: { accept: "application/json" } }),
-        env
+        runtime
       );
       if (isStale(t)) return;
       emit({ t: "task_state", taskId, state: "done" });
@@ -284,8 +290,8 @@ export function createDemoController(emit: (e: TourEvent) => void): DemoControll
 
     try {
       note("Forking both requests…");
-      const program = withScopeAsync((parentScope: any) => zipPar(e1, e2, parentScope));
-      const [r1, r2] = await toPromise(program, env);
+      const program = withScopeAsync(runtime, (parentScope: any) => zipPar(e1, e2, parentScope));
+      const [r1, r2] = await runPromise(program, runtime);
       if (isStale(t)) return;
 
       emit({ t: "task_state", taskId: task1, state: "done" });
@@ -325,17 +331,17 @@ export function createDemoController(emit: (e: TourEvent) => void): DemoControll
     runningTasks.add(mkTask(task2, scopeId, "POST /posts #2 (manual scope)") .id);
 
     note("Scenario: same as parallel zipPar, but you manage Scope lifetime manually.");
-    note("Pattern: const s = new Scope(env); try { ... } finally { s.close(); }");
+    note("Pattern: const s = new Scope(runtime); try { ... } finally { s.close(); }");
     await sleep(250); if (isStale(t)) return;
 
     const e1 = http.postJson<Post>("/posts", postBody, { headers: { accept: "application/json" } });
     const e2 = http.postJson<Post>("/posts", postBody, { headers: { accept: "application/json" } });
 
-    const parentScope = new Scope(env);
+    const parentScope = new Scope(runtime);
     try {
       note("Forking both requests…");
       const program = zipPar(e1, e2, parentScope);
-      const [r1, r2] = await toPromise(program, env);
+      const [r1, r2] = await runPromise(program, runtime);
       if (isStale(t)) return;
 
       emit({ t: "task_state", taskId: task1, state: "done" });
