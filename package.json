@@ -13,6 +13,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "dev": "node dist/index.js",
+    "audit:dependencies": "npm audit --audit-level=high",
     "audit:prod": "npm audit --omit=dev --audit-level=high",
     "validate:release-policy": "node scripts/check-release-policy.mjs",
     "validate:beta-version": "node scripts/prepare-beta.mjs 1.3.0-beta.0",
