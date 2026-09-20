@@ -36,6 +36,11 @@ The generated project depends on:
 - `brass-runtime`
 - (optionally) `brass-runtime/http` or `brass-http` depending on your setup
 
+Both templates exercise the additive `brass-runtime/next` preview through a
+local `src/runtime/brass.ts` facade. Unsupported preview concepts stay on the
+stable v1 entrypoint behind that same boundary, so adopting or rolling back the
+preview is explicit and local.
+
 ## What you get
 
 The templates ship with:
@@ -51,6 +56,32 @@ Build the CLI:
 ```bash
 npm install
 npm run build
+```
+
+Build both generated templates against their declared dependencies:
+
+```bash
+npm run test:templates
+```
+
+To validate against a local Brass release candidate instead:
+
+```bash
+npm run test:templates -- --runtime-tarball /path/to/brass-runtime.tgz
+```
+
+Verify the stable-v1 facade rollback in staged copies of both templates:
+
+```bash
+npm run test:templates:rollback -- --runtime-tarball /path/to/brass-runtime.tgz
+```
+
+Rehearse the same facade rollback through a v2 beta candidate's explicit
+`brass-runtime/v1` bridge:
+
+```bash
+npm run test:templates:v2-beta -- --runtime-tarball /path/to/brass-runtime-2.0.0-beta.0.tgz
+npm run test:templates:v1-bridge -- --runtime-tarball /path/to/brass-runtime-2.0.0-beta.0.tgz
 ```
 
 Run it directly:

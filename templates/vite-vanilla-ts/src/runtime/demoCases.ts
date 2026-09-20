@@ -1,8 +1,13 @@
 import type { Task, TourEvent } from "../types";
 
-// Use your real exports (these match your example snippet).
-// NOTE: withScopeAsync is the safe variant for Async/Effect-returning bodies.
-import { fromPromiseAbortable, Scope, toPromise, withScopeAsync, zipPar } from "brass-runtime";
+import {
+  Effect,
+  makeRuntime,
+  runPromise,
+  Scope,
+  withScopeAsync,
+  zipPar
+} from "./brass";
 import { httpClient, httpClientWithMeta } from "brass-runtime/http";
 
 type Env = any;
@@ -57,6 +62,7 @@ export type DemoController = {
 
 export function createDemoController(emit: (e: TourEvent) => void): DemoController {
   const env: Env = {};
+  const runtime = makeRuntime(env);
   const scopeId = "S1";
 
   // Track what is currently "running" in the UI so hard-cancel can stop it.
@@ -140,7 +146,7 @@ export function createDemoController(emit: (e: TourEvent) => void): DemoControll
   };
 
 
-  const demoSimpleCalls = fromPromiseAbortable(
+  const demoSimpleCalls = Effect.fromPromiseAbortable(
     async (signal) => {
       const respuesta = await fetch("https://jsonplaceholder.typicode.com/posts/1", { signal });
       if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`);
@@ -150,7 +156,7 @@ export function createDemoController(emit: (e: TourEvent) => void): DemoControll
     (e) => e
   );
 
-  const demoSimpleCalls404 = fromPromiseAbortable(
+  const demoSimpleCalls404 = Effect.fromPromiseAbortable(
     async (signal) => {
       const respuesta = await fetch("https://jsonplaceholder.typicode.com/posts/123456", { signal });
       if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`);
@@ -177,7 +183,7 @@ export function createDemoController(emit: (e: TourEvent) => void): DemoControll
 
     note("Starting request… (Try Hard cancel while it runs)");
     try {
-      const r = await toPromise(demoSimpleCalls as any, env);
+      const r = await runPromise(demoSimpleCalls as any, runtime);
       if (isStale(t)) return;
       const s = summarizeHttp(r);
       emit({ t: "task_state", taskId, state: "done" });
@@ -205,7 +211,7 @@ export function createDemoController(emit: (e: TourEvent) => void): DemoControll
     if (isStale(t)) return;
 
     try {
-      const r = await toPromise(demoSimpleCalls404 as any, env);
+      const r = await runPromise(demoSimpleCalls404 as any, runtime);
       if (isStale(t)) return;
       const s = summarizeHttp(r);
       emit({ t: "task_state", taskId, state: "done" });
@@ -235,7 +241,7 @@ export function createDemoController(emit: (e: TourEvent) => void): DemoControll
     if (isStale(t)) return;
 
     try {
-      const r = await toPromise(http.getJson<Post>("/posts/1") as any, env);
+      const r = await runPromise(http.getJson<Post>("/posts/1") as any, runtime);
       if (isStale(t)) return;
       const s = summarizeHttp(r);
       emit({ t: "task_state", taskId, state: "done" });
@@ -267,7 +273,7 @@ export function createDemoController(emit: (e: TourEvent) => void): DemoControll
     if (isStale(t)) return;
 
     try {
-      const r = await toPromise(http.postJson("/posts", postBody, { headers: { accept: "application/json" } }) as any, env);
+      const r = await runPromise(http.postJson("/posts", postBody, { headers: { accept: "application/json" } }) as any, runtime);
       if (isStale(t)) return;
       const s = summarizeHttp(r);
       emit({ t: "task_state", taskId, state: "done" });
@@ -306,8 +312,8 @@ export function createDemoController(emit: (e: TourEvent) => void): DemoControll
 
     note("zipPar forks both tasks and waits for both results.");
     try {
-      const program = withScopeAsync((parentScope: any) => zipPar(e1 as any, e2 as any, parentScope));
-      const [r1, r2] = await toPromise(program as any, env);
+      const program = withScopeAsync(runtime, (parentScope: any) => zipPar(e1 as any, e2 as any, parentScope));
+      const [r1, r2] = await runPromise(program as any, runtime) as [any, any];
       if (isStale(t)) return;
 
       const s1 = summarizeHttp(r1);
@@ -347,10 +353,10 @@ export function createDemoController(emit: (e: TourEvent) => void): DemoControll
     await sleep(200);
     if (isStale(t)) return;
 
-    const parentScope = new Scope(env);
+    const parentScope = new Scope(runtime);
     try {
       const program = zipPar(e1 as any, e2 as any, parentScope);
-      const [r1, r2] = await toPromise(program as any, env);
+      const [r1, r2] = await runPromise(program as any, runtime) as [any, any];
       if (isStale(t)) return;
 
       const s1 = summarizeHttp(r1);

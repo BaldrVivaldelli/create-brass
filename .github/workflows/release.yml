@@ -30,7 +30,9 @@ jobs:
 
       - name: Install deps (include optional)
         run: npm ci --include=optional
-      - run: npm run build --if-present
+      - run: npm run build
+      - run: npm run test:templates
+      - run: npm run test:templates:rollback
 
       - name: Semantic Release
         env:

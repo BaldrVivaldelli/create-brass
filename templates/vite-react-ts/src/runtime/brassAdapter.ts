@@ -1,5 +1,5 @@
 /**
- * Wire your real Brass API here.
+ * Optional compatibility adapter for custom visual tours.
  *
  * This template uses a Tour that emits high-level events.
  * You can implement it either:
@@ -9,9 +9,6 @@
  * Keep this adapter small so templates stay stable across runtime refactors.
  */
 
-// Example placeholder exports — replace with your real ones:
-// import { fork, withScope } from "brass-runtime";
-
 export type Cancel = () => void;
 
 export type BrassHandles = {
@@ -19,8 +16,8 @@ export type BrassHandles = {
 };
 
 /**
- * Default: a stub handle (the actual demo logic is in brassTour.ts).
- * Replace if you want to run real Effects and emit real events.
+ * Default: a stub handle. The active runtime demo lives in demoCases.ts and
+ * imports Brass only through brass.ts.
  */
 export function makeBrassHandles(): BrassHandles {
   return {

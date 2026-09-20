@@ -12,7 +12,11 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "dev": "node dist/index.js"
+    "dev": "node dist/index.js",
+    "test:templates": "node scripts/validate-templates.mjs",
+    "test:templates:rollback": "node scripts/validate-templates.mjs --stable-facade",
+    "test:templates:v2-beta": "node scripts/validate-templates.mjs --beta-facade",
+    "test:templates:v1-bridge": "node scripts/validate-templates.mjs --v1-facade"
   },
   "dependencies": {
     "picocolors": "^1.0.0",
