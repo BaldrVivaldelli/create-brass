@@ -99,13 +99,11 @@ jobs:
           name: create-brass-beta-${{ inputs.version }}
           path: artifacts/beta
 
-      - name: Verify npm authorization and immutable inputs
+      - name: Verify trusted-publishing prerequisites and immutable inputs
         env:
           BETA_VERSION: ${{ inputs.version }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           test "$(npm --version)" = "11.5.1"
-          npm whoami
           test -f "artifacts/beta/create-brass-${BETA_VERSION}.tgz"
           if npm view "create-brass@${BETA_VERSION}" version >/dev/null 2>&1; then
             echo "create-brass@${BETA_VERSION} already exists and cannot be overwritten" >&2
@@ -116,7 +114,6 @@ jobs:
       - name: Publish beta on next
         env:
           BETA_VERSION: ${{ inputs.version }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish "artifacts/beta/create-brass-${BETA_VERSION}.tgz" --access public --tag next --provenance
 
       - name: Verify registry tags after propagation

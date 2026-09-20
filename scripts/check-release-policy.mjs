@@ -21,6 +21,7 @@ for (const fragment of [
   "workflow_dispatch:",
   "github.ref == 'refs/heads/main' && inputs.publish",
   "environment: npm-stable",
+  "id-token: write",
   "npm install --global npm@11.5.1",
   "npm run audit:prod",
   "npm run validate:release-policy",
@@ -29,6 +30,9 @@ for (const fragment of [
   "npx semantic-release",
 ]) {
   if (!stableWorkflow.includes(fragment)) failures.push(`stable release workflow is missing: ${fragment}`);
+}
+for (const forbidden of ["secrets.NPM_TOKEN", "NODE_AUTH_TOKEN"]) {
+  if (stableWorkflow.includes(forbidden)) failures.push(`stable workflow must use trusted publishing, not: ${forbidden}`);
 }
 if (/^\s*push:/m.test(stableWorkflow)) {
   failures.push("stable release must not publish automatically on every main push");
@@ -39,6 +43,7 @@ for (const fragment of [
   "type: boolean",
   "group: create-brass-beta-${{ github.ref }}",
   "environment: npm-next",
+  "id-token: write",
   "node-version: 22",
   "npm install --global npm@11.5.1",
   "npm run audit:prod",
@@ -48,7 +53,7 @@ for (const fragment of [
   "node scripts/prepare-beta.mjs \"$BETA_VERSION\" --write",
   "--dry-run --access public --tag next --json",
   "--access public --tag next --provenance",
-  "npm whoami",
+  "test \"$(npm --version)\" = \"11.5.1\"",
   "for attempt in {1..20}",
   "sleep 15",
   "dist-tags.next",
@@ -57,6 +62,9 @@ for (const fragment of [
   "actions/download-artifact@v8",
 ]) {
   if (!betaWorkflow.includes(fragment)) failures.push(`beta workflow is missing: ${fragment}`);
+}
+for (const forbidden of ["npm whoami", "secrets.NPM_TOKEN", "NODE_AUTH_TOKEN"]) {
+  if (betaWorkflow.includes(forbidden)) failures.push(`beta workflow must use trusted publishing, not: ${forbidden}`);
 }
 if (betaWorkflow.includes("npm publish") && !betaWorkflow.includes("if: ${{ inputs.publish }}")) {
   failures.push("beta publication must remain explicitly opt-in");

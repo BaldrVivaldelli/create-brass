@@ -100,6 +100,9 @@ node dist/index.js my-app --template=vite-react-ts
 
 - `latest` is the stable CLI and is released only from `main`.
 - `next` is an explicit beta published only by the protected manual workflow.
+- Stable and beta publication use npm Trusted Publishing (OIDC), bound to their
+  exact workflow files and the protected `npm-stable` / `npm-next`
+  environments; neither channel uses a long-lived npm token.
 - Beta publication records `latest` before publishing and verifies that it did
   not move after npm registry propagation.
 
