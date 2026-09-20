@@ -7,6 +7,7 @@ const lockfile = JSON.parse(readFileSync(new URL("../package-lock.json", import.
 const releaseConfig = JSON.parse(readFileSync(new URL("../.releaserc.json", import.meta.url), "utf8"));
 const stableWorkflow = readFileSync(new URL("../.github/workflows/release.yml", import.meta.url), "utf8");
 const betaWorkflow = readFileSync(new URL("../.github/workflows/publish-beta.yml", import.meta.url), "utf8");
+const qualityWorkflow = readFileSync(new URL("../.github/workflows/quality.yml", import.meta.url), "utf8");
 const failures = [];
 
 if (manifest.version !== lockfile.version || manifest.version !== lockfile.packages?.[""]?.version) {
@@ -21,7 +22,10 @@ for (const fragment of [
   "github.ref == 'refs/heads/main' && inputs.publish",
   "environment: npm-stable",
   "npm install --global npm@11.5.1",
+  "npm run audit:prod",
   "npm run validate:release-policy",
+  "npm run validate:evidence",
+  "npm run test:evidence",
   "npx semantic-release",
 ]) {
   if (!stableWorkflow.includes(fragment)) failures.push(`stable release workflow is missing: ${fragment}`);
@@ -37,6 +41,9 @@ for (const fragment of [
   "environment: npm-next",
   "node-version: 22",
   "npm install --global npm@11.5.1",
+  "npm run audit:prod",
+  "npm run validate:evidence",
+  "npm run test:evidence",
   "brass-runtime@2.0.0-beta.0",
   "node scripts/prepare-beta.mjs \"$BETA_VERSION\" --write",
   "--dry-run --access public --tag next --json",
@@ -53,6 +60,16 @@ for (const fragment of [
 }
 if (betaWorkflow.includes("npm publish") && !betaWorkflow.includes("if: ${{ inputs.publish }}")) {
   failures.push("beta publication must remain explicitly opt-in");
+}
+for (const fragment of [
+  "npm run audit:prod",
+  "npm run validate:release-policy",
+  "npm run validate:evidence",
+  "npm run test:evidence",
+  "npm run test:templates",
+  "npm run test:templates:rollback",
+]) {
+  if (!qualityWorkflow.includes(fragment)) failures.push(`quality workflow is missing: ${fragment}`);
 }
 
 if (failures.length > 0) {

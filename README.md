@@ -99,6 +99,12 @@ node dist/index.js my-app --template=vite-react-ts
 - Beta publication records `latest` before publishing and verifies that it did
   not move after npm registry propagation.
 
+The dated [beta readiness evidence](docs/evidence/beta-readiness-2026-09-20.json)
+records the merged migration, four two-template build modes, retained artifact,
+release protections, production dependency audit, registry state, and the
+authentication blocker observed during that attempt without claiming external
+adoption.
+
 Try an approved beta without replacing the stable CLI:
 
 ```bash

@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "kind": "create-brass-beta-readiness",
+  "recordedAt": "2026-09-20T18:29:13Z",
+  "status": "validated-not-published",
+  "source": {
+    "repository": "BaldrVivaldelli/create-brass",
+    "branch": "main",
+    "sha": "2237043cc77c7eb025517160bbec0dacab22c4c8",
+    "stableVersion": "1.2.1"
+  },
+  "migration": {
+    "pullRequest": 13,
+    "pullRequestUrl": "https://github.com/BaldrVivaldelli/create-brass/pull/13",
+    "mergedAt": "2026-09-20T18:25:34Z",
+    "mergeCommitSha": "2237043cc77c7eb025517160bbec0dacab22c4c8",
+    "qualityRunId": 35528946337,
+    "qualityJobId": 106125984575,
+    "qualityResult": "success",
+    "relationship": "first-party public template consumer",
+    "claimBoundary": "This proves a first-party migration and distribution candidate, not independent external production adoption or a publishable adopter case study."
+  },
+  "candidate": {
+    "version": "1.3.0-beta.0",
+    "distTag": "next",
+    "runtimeBeta": "brass-runtime@2.0.0-beta.0",
+    "templateVariants": 2,
+    "validationMatrix": [
+      { "mode": "declared stable dependency", "buildsPassed": 2, "buildsTotal": 2 },
+      { "mode": "stable facade rollback", "buildsPassed": 2, "buildsTotal": 2 },
+      { "mode": "public beta v2 root", "buildsPassed": 2, "buildsTotal": 2 },
+      { "mode": "public beta /v1 bridge", "buildsPassed": 2, "buildsTotal": 2 }
+    ],
+    "workflow": {
+      "runId": 35529031936,
+      "runUrl": "https://github.com/BaldrVivaldelli/create-brass/actions/runs/35529031936",
+      "event": "workflow_dispatch",
+      "validationJobId": 106126220440,
+      "validationResult": "success"
+    },
+    "artifact": {
+      "id": 10611185593,
+      "name": "create-brass-beta-1.3.0-beta.0",
+      "archiveBytes": 17030,
+      "archiveDigest": "sha256:06716873cf770059b2023bcfcd52fa0fdc5f366d132cf0bd32983296574f8c29",
+      "expiresAt": "2026-12-19T18:25:56Z",
+      "tarball": {
+        "filename": "create-brass-1.3.0-beta.0.tgz",
+        "bytes": 16848,
+        "unpackedBytes": 67185,
+        "files": 32,
+        "sha256": "6e080764342729cb6147ac8748964c523931279e1a1bdeee7fae373656cb3121",
+        "shasum": "392360ba0dbcbae9bc91eeab515008c16315d998",
+        "integrity": "sha512-ql1RB23ilgzMnjZuv3+UpHVb+IB1az7yh9ee4tdh81wn+aVQY0QFFUHMhTGi4bQC71qrfrdU6s6DAZSdUWj+cQ=="
+      }
+    }
+  },
+  "publicationAttempt": {
+    "runId": 35529031936,
+    "jobId": 106126387225,
+    "environment": "npm-next",
+    "environmentId": 22344300068,
+    "approvalGranted": true,
+    "authentication": "repository NPM_TOKEN",
+    "preflight": "npm whoami",
+    "errorCode": "E401",
+    "result": "npm-token-unauthorized",
+    "publishStep": "skipped",
+    "registryMutation": false
+  },
+  "registry": {
+    "checkedAt": "2026-09-20T18:29:13Z",
+    "latest": "1.2.1",
+    "next": null,
+    "candidatePublished": false
+  },
+  "controls": {
+    "mainProtected": true,
+    "requiredChecks": ["templates", "CodeQL"],
+    "adminsEnforced": true,
+    "forcePushesAllowed": false,
+    "deletionsAllowed": false,
+    "stableAutomaticPublish": false,
+    "stableEnvironment": "npm-stable",
+    "betaEnvironment": "npm-next",
+    "environmentReviewerRequired": true,
+    "npmCli": "11.5.1",
+    "provenanceRequested": true
+  },
+  "security": {
+    "command": "npm audit --omit=dev --json",
+    "productionDependencies": 5,
+    "productionVulnerabilities": 0
+  },
+  "rollback": {
+    "stableCli": "npm create brass@1.2.1",
+    "stableRuntimeFacade": "replace each local facade with stable brass-runtime root imports",
+    "betaV1Bridge": "replace each local facade with brass-runtime/v1 plus Effect.fromPromiseAbortable",
+    "latestMustRemain": "1.2.1"
+  },
+  "limitations": [
+    "The npm beta was not published because the repository token failed npm whoami with E401 before the publish step.",
+    "The retained artifact expires; committed hashes preserve its identity after expiry.",
+    "Template production builds do not establish external production adoption, retention, latency, or operational reliability.",
+    "The public repository is first-party and does not satisfy the independent external case-study target."
+  ],
+  "reproduce": [
+    "npm run validate:release-policy",
+    "npm run test:templates",
+    "npm run test:templates:rollback",
+    "npm run test:templates:v2-beta -- --runtime-tarball <brass-runtime-2.0.0-beta.0.tgz>",
+    "npm run test:templates:v1-bridge -- --runtime-tarball <brass-runtime-2.0.0-beta.0.tgz>",
+    "gh run download 35529031936 --name create-brass-beta-1.3.0-beta.0",
+    "sha256sum create-brass-1.3.0-beta.0.tgz"
+  ]
+}
