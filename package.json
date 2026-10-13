@@ -29,14 +29,8 @@
     "prompts": "^2.4.2"
   },
   "devDependencies": {
-    "@semantic-release/changelog": "^6.0.0",
-    "@semantic-release/commit-analyzer": "^13.0.0",
-    "@semantic-release/git": "^10.0.0",
-    "@semantic-release/github": "^11.0.0",
-    "@semantic-release/npm": "^13.1.5",
-    "@semantic-release/release-notes-generator": "^14.1.1",
-    "conventional-changelog-conventionalcommits": "^7.x.x",
     "@types/prompts": "^2.4.9",
+    "conventional-changelog-conventionalcommits": "^7.x.x",
     "tsup": "^8.2.0",
     "typescript": "^5.5.4"
   }

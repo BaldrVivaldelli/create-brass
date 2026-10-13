@@ -105,6 +105,9 @@ node dist/index.js my-app --template=vite-react-ts
   environments; neither channel uses a long-lived npm token.
 - Beta publication records `latest` before publishing and verifies that it did
   not move after npm registry propagation.
+- semantic-release and its plugins are pinned in the stable release job and
+  installed there on demand, not kept in `devDependencies`, so the locked tree
+  gated by `npm run audit:dependencies` stays free of their unpatched advisories.
 
 The dated [beta readiness evidence](docs/evidence/beta-readiness-2026-09-20.json)
 records the merged migration, four two-template build modes, retained artifact,
