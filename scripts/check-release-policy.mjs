@@ -27,9 +27,24 @@ for (const fragment of [
   "npm run validate:release-policy",
   "npm run validate:evidence",
   "npm run test:evidence",
-  "npx semantic-release",
+  "--package semantic-release@25.0.9",
+  "--package @semantic-release/changelog@6.0.3",
+  "--package @semantic-release/git@10.0.1",
 ]) {
   if (!stableWorkflow.includes(fragment)) failures.push(`stable release workflow is missing: ${fragment}`);
+}
+// semantic-release and its plugins pull in advisories with no patched release
+// (braces via micromatch, the npm CLI's bundled deps), so they stay pinned in
+// the release job and out of the audited lockfile.
+const releaseTooling = (name) => name === "semantic-release" || name.startsWith("@semantic-release/");
+for (const section of ["dependencies", "devDependencies", "optionalDependencies"]) {
+  for (const name of Object.keys(manifest[section] ?? {}).filter(releaseTooling)) {
+    failures.push(`${name} must stay pinned in the release job, not in package.json ${section}`);
+  }
+}
+for (const key of Object.keys(lockfile.packages ?? {})) {
+  const name = key.slice(key.lastIndexOf("node_modules/") + "node_modules/".length);
+  if (releaseTooling(name)) failures.push(`lockfile must not contain release tooling: ${key}`);
 }
 for (const forbidden of ["secrets.NPM_TOKEN", "NODE_AUTH_TOKEN"]) {
   if (stableWorkflow.includes(forbidden)) failures.push(`stable workflow must use trusted publishing, not: ${forbidden}`);
