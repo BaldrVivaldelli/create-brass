@@ -1,5 +1,11 @@
 # Unreleased
 
+- Stable releases no longer push a version commit to `main`. The branch only
+  takes pull requests with required checks, enforced for admins too, so
+  `@semantic-release/git` would have failed every release before publishing.
+  The Git tag and npm `latest` are now the released version, release notes
+  live in GitHub Releases, and the release policy rejects the Git and
+  changelog plugins.
 - Add a protected, opt-in `next` beta channel with exact-version validation,
   runtime-v2 and v1-rollback template builds, npm provenance, immutable-version
   checks, and a post-publication guard that preserves `latest`.
