@@ -28,10 +28,21 @@ for (const fragment of [
   "npm run validate:evidence",
   "npm run test:evidence",
   "--package semantic-release@25.0.9",
-  "--package @semantic-release/changelog@6.0.3",
-  "--package @semantic-release/git@10.0.1",
 ]) {
   if (!stableWorkflow.includes(fragment)) failures.push(`stable release workflow is missing: ${fragment}`);
+}
+// main only takes pull requests, with required checks enforced for admins
+// too, so a release that pushes a version commit fails before it publishes.
+// The Git tag and npm `latest` are the released version; the changelog plugin
+// only wrote a file for the Git plugin to commit.
+const pluginName = (plugin) => (Array.isArray(plugin) ? plugin[0] : plugin);
+for (const forbidden of ["@semantic-release/git", "@semantic-release/changelog"]) {
+  if ((releaseConfig.plugins ?? []).some((plugin) => pluginName(plugin) === forbidden)) {
+    failures.push(`stable semantic release must not use ${forbidden}: main only takes pull requests`);
+  }
+  if (stableWorkflow.includes(`--package ${forbidden}@`)) {
+    failures.push(`stable release workflow must not install ${forbidden}`);
+  }
 }
 // semantic-release and its plugins pull in advisories with no patched release
 // (braces via micromatch, the npm CLI's bundled deps), so they stay pinned in

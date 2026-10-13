@@ -50,16 +50,16 @@ jobs:
       - run: npm run test:templates
       - run: npm run test:templates:rollback
 
-      # semantic-release and its plugins are pinned here rather than kept in
-      # devDependencies: their tree carries advisories with no patched release
-      # (braces via micromatch, the npm CLI's bundled deps), and the lockfile
-      # must pass the full npm audit gate.
+      # semantic-release is pinned here rather than kept in devDependencies:
+      # its tree carries advisories with no patched release (braces via
+      # micromatch, the npm CLI's bundled deps), and the lockfile must pass the
+      # full npm audit gate. Its default plugins analyze, publish to npm and
+      # create the GitHub release; nothing pushes to main, which only takes
+      # pull requests.
       - name: Semantic Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: >-
           npx --yes
           --package semantic-release@25.0.9
-          --package @semantic-release/changelog@6.0.3
-          --package @semantic-release/git@10.0.1
           semantic-release
